@@ -1017,8 +1017,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3418131ce724451f8911636571270ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cubePrefab: {fileID: 2499753345229958065, guid: 239ae4b8e2d984444a823e6e8e1e1a56,
-    type: 3}
   allCubeTypes:
   - {fileID: 2260134546230419844, guid: f04fc1b489cd04272a1f10a5cda09ae7, type: 3}
   - {fileID: 4127440304271302905, guid: 9aaa9099de75940f8ba007c2c22b6812, type: 3}
@@ -1034,6 +1032,8 @@ MonoBehaviour:
   - {fileID: 1094936254965980488, guid: 47266049f3e8946149829b28c87303c8, type: 3}
   - {fileID: 663697994161442237, guid: 72abde7597b6d4c139cd5d7fb08d693c, type: 3}
   - {fileID: 5974509194515333552, guid: 4d62a9b96fd6841bab231c7e0647d7e7, type: 3}
+  smokeParticle: {fileID: 7520194578792384143, guid: e94af853c8bb62b4c934c125cd364f09,
+    type: 3}
   xSize: 3
   ySize: 4
   zSize: 3
@@ -1471,8 +1471,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4281670174
+  m_fontColor: {r: 0.11860729, g: 0.10083661, b: 0.20754719, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1489,13 +1489,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 88.6
-  m_fontSizeBase: 88.6
+  m_fontSize: 101.32
+  m_fontSizeBase: 101.32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1757,7 +1757,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.21780257, y: 0, z: 0, w: 0.9759929}
-  m_LocalPosition: {x: 1.45, y: 7.8, z: -10}
+  m_LocalPosition: {x: 1.05, y: 6.44, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3266,8 +3266,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slot1: {fileID: 1448512507}
-  slot2: {fileID: 402580995}
-  slot3: {fileID: 953455569}
   canvasCamera: {fileID: 57535985}
 --- !u!1 &2067216380
 GameObject:

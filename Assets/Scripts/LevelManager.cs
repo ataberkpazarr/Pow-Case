@@ -6,10 +6,12 @@ using System;
 
 public class LevelManager : Singleton<LevelManager>
 {
-    [SerializeField] private Cube cubePrefab;
-    [SerializeField] private Cube [] allCubeTypes;
 
-    /* inside of the allCubeTypes array
+    [SerializeField] private Cube [] allCubeTypes;
+    [SerializeField] private GameObject smokeParticle;
+
+
+    /* inside of the allCubeTypes array, the order of types are as following
     Avacado,
     Bell,
     BlueBerry,
@@ -25,7 +27,7 @@ public class LevelManager : Singleton<LevelManager>
     Donut,
     IceCream 
     */
-              
+
     [SerializeField] int xSize,ySize,zSize;
 
     Cube[,,] cubes;
@@ -33,7 +35,6 @@ public class LevelManager : Singleton<LevelManager>
     List<Cube> spawnedCubes;
 
     public static Action onCubeSpawnCompleted;
-
     System.Random random = new System.Random();
 
     private void Start()
@@ -41,7 +42,9 @@ public class LevelManager : Singleton<LevelManager>
         spawnedCubes = new List<Cube>();
         cubes = new Cube[xSize, ySize, zSize];
 
-        for (int i = 0; i < 12; i++)
+        //firstly 3 cubes from all types are being spawned at set to deactive
+
+        for (int i = 0; i < 12; i++) // we have 14 types but I used 12 for ease of development and for having total 3k amount of cubes in board, So I hve 36 cubes in the board
         {
             for (int k = 0; k < 3; k++)
             {
@@ -52,9 +55,8 @@ public class LevelManager : Singleton<LevelManager>
             }
             
         }
-        StartCoroutine(spawnCubesRoutine2());
-
-
+        //then after initiliazation of all cubes the relevant coroutine, for placing them randomly, is being called
+        StartCoroutine(SpawnCubesRoutine());
 
     }
 
@@ -64,42 +66,39 @@ public class LevelManager : Singleton<LevelManager>
         return allCubeTypes;
     }
     
-    private IEnumerator spawnCubesRoutine2()
+    private IEnumerator SpawnCubesRoutine() //placing cubes randomly and required tweens for fall effect
     {
-        yield return new WaitForSeconds(3f);
-        GameObject go = new GameObject();
+        yield return new WaitForSeconds(0.2f);
+
+        GameObject go = new GameObject(); // parent gameobject for cubes
         go.transform.position = new Vector3(0, 0, 0);
-        Sequence seq_ = DOTween.Sequence();
+
+        Sequence seq_ = DOTween.Sequence(); //fall tween sequence
+
         for (int x = 0; x < xSize; x++)
         {
 
             for (int z = 0; z < zSize; z++)
             {
-
-                //List<GameObject> instantiatedCubes = new List<GameObject>();
                 Sequence seq = DOTween.Sequence();
 
                 for (int y = 0; y < ySize; y++)
                 {
-                    //int num = random.Next(14);
-                    //Cube g = Instantiate(allCubeTypes[num], new Vector3(x, y+1, z), Quaternion.identity);
-                    //g.transform.SetParent(go.transform);
-                    //seq.Append(g.transform.DOLocalMoveY(y, 0.01f));
 
-                    //cubes[x, y, z] = g;
-
-                    int num = random.Next(spawnedCubes.Count);
-
+                    int num = random.Next(spawnedCubes.Count); //randomly locate already spawned cube at the relevant x,y,z position of board
                     Cube cube = spawnedCubes[num];
-                    cube.transform.position = new Vector3(x,y+2,z);
+
+                    cube.transform.position = new Vector3(x,y+2,z); // instantiate 2 unit above from actual position, in order to fall it
                     cube.transform.rotation = Quaternion.identity;
+
                     cube.transform.SetParent(go.transform);
                     cube.gameObject.SetActive(true);
-                    seq.Append(cube.transform.DOLocalMoveY(y, 0.01f));
-                    cubes[x, y, z] = cube;
-                    spawnedCubes.Remove(cube);
 
-                    //instantiatedCubes.Add(g);
+                    seq.Append(cube.transform.DOLocalMoveY(y, 0.01f).OnComplete(()=>SpawnSmoke(new Vector3(x,y,z)))); // fall to actual position
+
+                    cubes[x, y, z] = cube;
+                    spawnedCubes.Remove(cube); //remove placed cubes from spawnedCubes list
+
                 }
 
                 seq_.Append(seq);
@@ -108,16 +107,29 @@ public class LevelManager : Singleton<LevelManager>
 
 
         }
-        seq_.Play().OnComplete(()=>onCubeSpawnCompleted?.Invoke());
+        //seq_.Join(SpawnSmokes());
+        //when sequence is done, let other classes that cube spawn opearation is being done
+        seq_.Play().OnComplete(() => onCubeSpawnCompleted?.Invoke());
+
 
     }
+
+    private void SpawnSmoke(Vector3 pos)
+    {
+        int x = random.Next(0,5);
+        int y = random.Next(0,5);
+        int z = random.Next(0,5);
+        Instantiate(smokeParticle, pos+new Vector3(-x,-y,-z), Quaternion.identity);
+       
+    }
+   
 
     public Cube[,,] GetSpawnedCubes()
     {
         return cubes;
     }
 
-    public int[] GetInitialSizes()
+    public int[] GetInitialSizes() 
     {
         int[] sizes = new int[3];
         sizes[0] = xSize;

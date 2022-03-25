@@ -24,7 +24,7 @@ public enum CubeType
 public class Cube : MonoBehaviour
 {
     [SerializeField] private Material selectedMaterial, initialMaterial,matchMaterial;
-    [SerializeField] private MeshRenderer cubeMeshRenderer;
+
     [SerializeField] private Renderer renderer_;
     [SerializeField] private CubeType cubeType;
 
@@ -41,37 +41,25 @@ public class Cube : MonoBehaviour
     private Color matchedColour;
 
 
-    private Material[] materialArray;
 
-    private bool notSetAsSelectedYet;
 
     private void Start()
     {
         selectedColour = selectedMaterial.color;
         initialColour = initialMaterial.color;
         matchedColour = matchMaterial.color;
-        //new Color(138f,138f,224f,255f)
-        //materialArray = new Material[2];
-        //materialArray[0] = selectedMaterial;
+
     }
     public void SetAsSelected()
     {
 
         renderer_.material.color = selectedColour;
-        /*
-        materialArray = new Material[1];
-        materialArray[0] = selectedMaterial;
-        cubeMeshRenderer.materials = materialArray;
-      */
+
     }
 
     public void SetAsReleased()
     {
-        /*
-        materialArray = new Material[1];
-        materialArray[0] = initialMaterial;
-        cubeMeshRenderer.materials = materialArray;
-        */
+
         renderer_.material.color = initialColour;
     }
     public void SetAsMatched()
@@ -110,7 +98,7 @@ public class Cube : MonoBehaviour
         }
     }
 
-    public void HandleMatchAreaSpecifications()
+    public void HandleMatchAreaSpecifications() //if cube is at the match area
     {
         gameObject.transform.DOScale(new Vector3(0.6f, 0.6f, 0.6f), 0.5f);
         gameObject.layer = LayerMask.NameToLayer("UI");
@@ -118,12 +106,11 @@ public class Cube : MonoBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    private void HandleBoardSpecifications()
+    private void HandleBoardSpecifications() // if cube went back to board
     {
         isPlaced = false;
         gameObject.transform.DOScale(new Vector3(1, 1, 1), 0.5f);
         gameObject.layer = LayerMask.NameToLayer("Default");
-        //transform.rotation = Quaternion.identity;
         transform.parent = cubesParent;
         this.transform.localPosition = firstPosition;
         this.transform.rotation = cubesParent.rotation;

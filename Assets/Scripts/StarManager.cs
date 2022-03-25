@@ -30,14 +30,18 @@ public class StarManager : Singleton<StarManager>
         {
           
             GameObject star = Instantiate(starPrefab, canvasTransform, false);
-            //GameObject star = Instantiate(starPrefab, initalPos, Quaternion.identity);
+     
             star.SetActive(false);
             star.transform.DOScale(new Vector3(0.5f, 0.5f, 0.5f), 0.02f);
             star.layer = LayerMask.NameToLayer("UI");
             star.transform.SetParent(canvasTransform);
             star.SetActive(true);
             star.transform.position = initalPos + new Vector3(0, 0.7f, 0);
-            seq.Join(star.transform.DOMove(starIndicatorTransform.position, 0.7f+(i*0.1f)).OnComplete(()=>Destroy(star)));
+
+            //every newly instantiated star will be a bit slower than previously instantiated one, by the 0.7f+(i*0.1f) multiplication,
+            //in order to have effect of stars following their each in a line
+            seq.Join(star.transform.DOMove(starIndicatorTransform.position, 0.7f+(i*0.1f)).OnComplete(()=>Destroy(star))); 
+
             totalEarnedStars += 1;
             UpdateEarnedStarAmount();
         }
@@ -50,7 +54,6 @@ public class StarManager : Singleton<StarManager>
 
     private void UpdateEarnedStarAmount()
     {
-
         starAmountText.text = totalEarnedStars.ToString();
     }
 }

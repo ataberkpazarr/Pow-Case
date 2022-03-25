@@ -59,19 +59,14 @@ public class ComboManager : Singleton<ComboManager>
     private void StartComboBar()
     {
         timeLeft = maxTime;
-        //comboFillBar.fillAmount = 1;
     }
 
     public void IncreaseCombo()
     {
-        if (comboActive)
+        if (!comboActive)
         {
-            
 
-        }
-        else
-        {
-            comboActive = true; 
+            comboActive = true;
         }
         StartComboBar();
         currentCombo += 1;
@@ -91,7 +86,6 @@ public class ComboManager : Singleton<ComboManager>
     }
     public void StopCombo()
     {
-        //comboActive = false;
         gameDone = true;
     }
 }
