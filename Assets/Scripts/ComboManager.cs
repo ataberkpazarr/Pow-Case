@@ -28,10 +28,8 @@ public class ComboManager : Singleton<ComboManager>
         if (!gameDone)
         {
 
-
             if (comboActive)
             {
-
 
                 if (timeLeft > 0)
                 {
@@ -42,12 +40,10 @@ public class ComboManager : Singleton<ComboManager>
                 {
 
                     comboActive = false;
-
                 }
             }
             else
             {
-
                 comboFillBar.fillAmount = 0;
                 currentCombo = 1;
                 UpdateComboText();
