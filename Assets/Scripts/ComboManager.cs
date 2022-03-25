@@ -13,6 +13,8 @@ public class ComboManager : Singleton<ComboManager>
     [SerializeField] private TextMeshProUGUI comboText;
 
     private bool comboActive = false;
+    private bool gameDone = false;
+
 
     private float timeLeft;
     private int currentCombo =1;
@@ -23,30 +25,34 @@ public class ComboManager : Singleton<ComboManager>
     }
     void Update()
     {
-        if (comboActive)
+        if (!gameDone)
         {
 
 
-            if (timeLeft > 0)
+            if (comboActive)
             {
-                timeLeft -= Time.deltaTime;
-                comboFillBar.fillAmount = timeLeft / maxTime;
-            }
-            else if (timeLeft <= 0)
-            {
-               
-                comboActive = false;
 
+
+                if (timeLeft > 0)
+                {
+                    timeLeft -= Time.deltaTime;
+                    comboFillBar.fillAmount = timeLeft / maxTime;
+                }
+                else if (timeLeft <= 0)
+                {
+
+                    comboActive = false;
+
+                }
+            }
+            else
+            {
+
+                comboFillBar.fillAmount = 0;
+                currentCombo = 1;
+                UpdateComboText();
             }
         }
-        else
-        {
-            
-            comboFillBar.fillAmount = 0;
-            currentCombo = 1;
-            UpdateComboText();
-        }
-
         
     }
 
@@ -85,6 +91,7 @@ public class ComboManager : Singleton<ComboManager>
     }
     public void StopCombo()
     {
-        comboActive = false;
+        //comboActive = false;
+        gameDone = true;
     }
 }

@@ -97,7 +97,9 @@ public class MatchManager : Singleton<MatchManager>
 
     private IEnumerator DestroyNewlyMatchedCubesRoutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        //yield return new WaitForSeconds(0.5f);
+        yield return null;
+
         DestroyNewlyMatchedCubes();
 
     }
@@ -116,10 +118,10 @@ public class MatchManager : Singleton<MatchManager>
             if (activeCubesInMatchArea[i].CubeTypeInfo==type_)
             {
                 Cube cube = activeCubesInMatchArea[i];
-                //cube.SetAsSelected();
+                
                 cube.SetAsMatched();
                 indexes[k] = i;
-                //Destroy(cube.gameObject);
+                
                 matchedCubes[k] = cube;
                 k = k + 1;
 
