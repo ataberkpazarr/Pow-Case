@@ -7,7 +7,10 @@ public class GamePlayManager : Singleton<GamePlayManager>
 {
 
     [SerializeField] private Transform slot1, slot2, slot3;
+    [SerializeField] private Camera canvasCamera;
+
     private bool TouchActive = false;
+    private bool cubeHolded = false;
     private Cube previouslySelectedCube;
 
     private GameObject cubesParent;
@@ -31,44 +34,92 @@ public class GamePlayManager : Singleton<GamePlayManager>
         TouchActive = true;
 
         previousTouchPos = leanFinger.StartScreenPosition;
-        /*
         Ray ray = leanFinger.GetRay();
         RaycastHit hitInfo;
         if (Physics.Raycast(ray, out hitInfo))
         {
             if (hitInfo.collider != null && hitInfo.collider.gameObject.CompareTag("Cube"))
             {
-                Vector3 pos = hitInfo.collider.gameObject.transform.localPosition;
-                int x = (int)pos.x;
-                int y = (int)pos.y;
-                int z = (int)pos.z;
-                Cube selectedCube = cubes[x, y, z];
-
-                Vector3 posToPlace = slot1.position;
-                posToPlace.x = posToPlace.x + lastPlacedSlotPosition * 0.61f;
-                    
-                selectedCube.transform.position = posToPlace;
-                lastPlacedSlotPosition += 1;
-                Sequence seq = DOTween.Sequence();
-                //seq.Append(selectedCube.gameObject.transform.DOMove(slot1.position,1f));
-                //seq.Append(selectedCube.gameObject.transform.DOScale(new Vector3(0.6f,0.6f,0.6f),0.2f));
-                //seq.Play();
-                selectedCube.gameObject.transform.DOScale(new Vector3(0.6f, 0.6f, 0.6f), 0.5f);
-                selectedCube.gameObject.layer = LayerMask.NameToLayer("UI");
-                selectedCube.SetItAsPlaced();
-                placedCubes.Add(selectedCube);
-
+                cubeHolded = true;
+                Debug.Log("aaaa");
             }
         }
-        */
-    }
+
+
+        RaycastHit hit_;
+        Ray ray_ = canvasCamera.ScreenPointToRay(leanFinger.StartScreenPosition);
+
+        if (Physics.Raycast(ray_, out hit_))
+        {
+            //Transform objectHit = hit_.transform;
+            if (hit_.collider != null && hit_.collider.gameObject.CompareTag("Cube"))
+            {
+                Cube cube = hit_.collider.gameObject.GetComponent<Cube>();
+                if (cube.GoToFirstBoardPosition())
+                {
+                    
+                    MatchManager.Instance.HandleCubesThatBackedToBoard();
+                    lastPlacedSlotPosition -= 1;
+                }
+                
+                
+            }
+        }
+            //Vector3 mousePos = Camera.main.ScreenToWorldPoint();   
+            /*
+            Ray ray_ = leanFinger.GetStartRay();
+
+
+            RaycastHit2D hitNormalTile = Physics2D.GetRayIntersection(ray_);
+
+            if (hitNormalTile && hitNormalTile.collider.gameObject.CompareTag("Cube")) //if ray collided to something and that something is a normal tile
+            {
+                Debug.Log("kkk");
+            }
+            */
+            /*
+            Ray ray = leanFinger.GetRay();
+            RaycastHit hitInfo;
+            if (Physics.Raycast(ray, out hitInfo))
+            {
+                if (hitInfo.collider != null && hitInfo.collider.gameObject.CompareTag("Cube"))
+                {
+                    Vector3 pos = hitInfo.collider.gameObject.transform.localPosition;
+                    int x = (int)pos.x;
+                    int y = (int)pos.y;
+                    int z = (int)pos.z;
+                    Cube selectedCube = cubes[x, y, z];
+
+                    Vector3 posToPlace = slot1.position;
+                    posToPlace.x = posToPlace.x + lastPlacedSlotPosition * 0.61f;
+
+                    selectedCube.transform.position = posToPlace;
+                    lastPlacedSlotPosition += 1;
+                    Sequence seq = DOTween.Sequence();
+                    //seq.Append(selectedCube.gameObject.transform.DOMove(slot1.position,1f));
+                    //seq.Append(selectedCube.gameObject.transform.DOScale(new Vector3(0.6f,0.6f,0.6f),0.2f));
+                    //seq.Play();
+                    selectedCube.gameObject.transform.DOScale(new Vector3(0.6f, 0.6f, 0.6f), 0.5f);
+                    selectedCube.gameObject.layer = LayerMask.NameToLayer("UI");
+                    selectedCube.SetItAsPlaced();
+                    placedCubes.Add(selectedCube);
+
+                }
+            }
+            */
+        }
 
     private void OnFingerUp(LeanFinger leanFinger)
     {
 
         TouchActive = false;
-        previouslySelectedCube.SetAsReleased();
-        previouslySelectedCube=null;
+        //bak buraya
+        if (previouslySelectedCube!=null)
+        {
+            previouslySelectedCube.SetAsReleased();
+            previouslySelectedCube = null;
+        }
+      
         notRotatedYet = true;
 
         if (notRotated)
@@ -96,12 +147,17 @@ public class GamePlayManager : Singleton<GamePlayManager>
                     //seq.Append(selectedCube.gameObject.transform.DOMove(slot1.position,1f));
                     //seq.Append(selectedCube.gameObject.transform.DOScale(new Vector3(0.6f,0.6f,0.6f),0.2f));
                     //seq.Play();
+                    /*
                     selectedCube.gameObject.transform.DOScale(new Vector3(0.6f, 0.6f, 0.6f), 0.5f);
                     selectedCube.gameObject.layer = LayerMask.NameToLayer("UI");
                     selectedCube.transform.parent = null;
                     selectedCube.transform.rotation = Quaternion.identity;
-                    selectedCube.SetItAsPlaced();
-                    placedCubes.Add(selectedCube);
+                    */
+                    selectedCube.SetItAsTakenToMatchArea();
+
+                    selectedCube.HandleMatchAreaSpecifications();
+                    //placedCubes.Add(selectedCube);
+                    MatchManager.Instance.AddCubeToActiveCubesList(selectedCube);
 
                 }
             }
@@ -109,13 +165,14 @@ public class GamePlayManager : Singleton<GamePlayManager>
             
         }
         notRotated = true;
+        cubeHolded = false;
 
     }
 
     private void OnFingerUpdate(LeanFinger leanFinger)
     {
 
-        if (TouchActive)
+        if (TouchActive && cubeHolded)
         {
             
             Ray ray = leanFinger.GetRay();
@@ -138,6 +195,7 @@ public class GamePlayManager : Singleton<GamePlayManager>
             {
                 if (hitInfo.collider != null && hitInfo.collider.gameObject.CompareTag("Cube"))
                 {
+                    
                     Vector3 pos = hitInfo.collider.gameObject.transform.localPosition;
                     int x = (int)pos.x;
                     int y = (int)pos.y;
@@ -155,7 +213,7 @@ public class GamePlayManager : Singleton<GamePlayManager>
                         previouslySelectedCube = selectedCube;
                         selectedCube.SetAsSelected();
                     }
-                    Debug.Log(pos);
+                    //Debug.Log(pos);
                    
                 }
             }
@@ -223,6 +281,16 @@ public class GamePlayManager : Singleton<GamePlayManager>
 
         }
     }
+    public Transform GetCubesParentTransform()
+    {
+
+        return cubesParent.transform;
+    }
+    private void HandleNewMatch()
+    {
+        lastPlacedSlotPosition -= 3;
+    }
+   
 
     private void GetSpawnedCubes()
     {
@@ -238,6 +306,8 @@ public class GamePlayManager : Singleton<GamePlayManager>
         LeanTouch.OnFingerUpdate += OnFingerUpdate;
         LeanTouch.OnFingerUp += OnFingerUp;
         LevelManager.onCubeSpawnCompleted += GetSpawnedCubes;
+        MatchManager.onMatchOccured += HandleNewMatch;
+
 
     }
 
@@ -247,6 +317,7 @@ public class GamePlayManager : Singleton<GamePlayManager>
         LeanTouch.OnFingerUpdate -= OnFingerUpdate;
         LeanTouch.OnFingerUp -= OnFingerUp;
         LevelManager.onCubeSpawnCompleted -= GetSpawnedCubes;
+        MatchManager.onMatchOccured -= HandleNewMatch;
 
 
     }
